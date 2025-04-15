@@ -2,10 +2,162 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
-  <title>我的第一個網站</title>
+  <title>郁雯仙女得第一</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: #ffe6f0;
+      font-family: "微軟正黑體", "Noto Sans TC", sans-serif;
+      overflow: hidden;
+    }
+
+    .content {
+      text-align: center;
+      padding-top: 100px;
+      z-index: 2;
+      position: relative;
+    }
+
+    h1 {
+      color: #e91e63;
+      font-size: 3em;
+      margin-bottom: 20px;
+      animation: fadeIn 1.5s ease;
+    }
+
+    p {
+      color: #333;
+      font-size: 1.5em;
+      animation: fadeIn 2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 中央跑馬燈 */
+    .marquee {
+      position: fixed;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      transform: translateY(-50%);
+      white-space: nowrap;
+      overflow: hidden;
+      font-size: 2em;
+      color: #e91e63;
+      opacity: 0.7;
+      animation: marquee 12s linear infinite;
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    @keyframes marquee {
+      0% { transform: translateY(-50%) translateX(100%); }
+      100% { transform: translateY(-50%) translateX(-100%); }
+    }
+
+    /* 飄落愛心 */
+    .heart {
+      position: absolute;
+      color: #ff69b4;
+      font-size: 1.5em;
+      animation: fall linear infinite;
+      z-index: 1;
+    }
+
+    @keyframes fall {
+      0% {
+        top: -10%;
+        opacity: 1;
+        transform: translateX(0) rotate(0deg);
+      }
+      100% {
+        top: 110%;
+        opacity: 0;
+        transform: translateX(50px) rotate(360deg);
+      }
+    }
+
+    /* 愛心爆炸按鈕 */
+    .love-btn {
+      background-color: #ff69b4;
+      color: white;
+      border: none;
+      border-radius: 30px;
+      padding: 12px 24px;
+      font-size: 1.2em;
+      cursor: pointer;
+      margin-top: 120px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      transition: transform 0.2s;
+    }
+
+    .love-btn:hover {
+      transform: scale(1.1);
+    }
+
+    /* 爆炸愛心樣式 */
+    .explosion-heart {
+      position: absolute;
+      font-size: 1.2em;
+      color: #ff1493;
+      pointer-events: none;
+      animation: explode 1s ease-out forwards;
+    }
+
+    @keyframes explode {
+      to {
+        transform: translate(var(--x), var(--y)) scale(1.5);
+        opacity: 0;
+      }
+    }
+  </style>
 </head>
 <body>
-  <h1>哈囉！郁雯大美女😎</h1>
-  <p>你怎麼這麼漂亮～</p>
+  <div class="content">
+    <h1>哈囉！郁雯仙女 😎</h1>
+    <p>你怎麼這麼甜～</p>
+    <button class="love-btn" onclick="explodeHearts(event)">💘 給甜甜一個愛心</button>
+  </div>
+
+  <!-- 跑馬燈 -->
+  <div class="marquee">💖💖💖 蕙質蘭心 💖💖💖 沉魚落雁 💖💖💖 傾國傾城 💖💖💖</div>
+
+  <!-- 飄落愛心 -->
+  <script>
+    // 飄落愛心
+    for (let i = 0; i < 30; i++) {
+      const heart = document.createElement('div');
+      heart.className = 'heart';
+      heart.innerText = '💖';
+      heart.style.left = Math.random() * 100 + 'vw';
+      heart.style.animationDuration = (5 + Math.random() * 5) + 's';
+      heart.style.fontSize = (1 + Math.random() * 2) + 'em';
+      document.body.appendChild(heart);
+    }
+
+    // 愛心爆炸動畫
+    function explodeHearts(e) {
+      const x = e.clientX;
+      const y = e.clientY;
+      for (let i = 0; i < 10; i++) {
+        const heart = document.createElement('div');
+        heart.className = 'explosion-heart';
+        heart.textContent = '💖';
+        heart.style.left = x + 'px';
+        heart.style.top = y + 'px';
+        const angle = Math.random() * 2 * Math.PI;
+        const distance = 80 + Math.random() * 40;
+        const dx = Math.cos(angle) * distance + 'px';
+        const dy = Math.sin(angle) * distance + 'px';
+        heart.style.setProperty('--x', dx);
+        heart.style.setProperty('--y', dy);
+        document.body.appendChild(heart);
+        setTimeout(() => heart.remove(), 1000);
+      }
+    }
+  </script>
 </body>
 </html>
