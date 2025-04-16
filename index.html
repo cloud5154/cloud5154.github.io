@@ -66,16 +66,8 @@
     }
 
     @keyframes fall {
-      0% {
-        top: -10%;
-        opacity: 1;
-        transform: translateX(0) rotate(0deg);
-      }
-      100% {
-        top: 110%;
-        opacity: 0;
-        transform: translateX(50px) rotate(360deg);
-      }
+      0% { top: -10%; opacity: 1; transform: translateX(0) rotate(0deg); }
+      100% { top: 110%; opacity: 0; transform: translateX(50px) rotate(360deg); }
     }
 
     .love-btn {
@@ -110,7 +102,6 @@
       }
     }
 
-    /* 愛心統計區塊 */
     .heart-count {
       font-size: 1.3em;
       margin-top: 10px;
@@ -123,13 +114,43 @@
     <h1>哈囉！郁雯仙女 😎</h1>
     <p>你怎麼這麼甜～</p>
     <button class="love-btn" onclick="explodeHearts(event)">💘 給甜甜一個愛心</button>
-    <div class="heart-count">目前已收到 💖 <span id="heartCount">0</span> 次愛心！</div>
+    <div class="heart-count">目前已收到 💖 <span id="heartCount">...</span> 次愛心！</div>
   </div>
 
   <div class="marquee">💖💖💖 蕙質蘭心 💖💖💖 沉魚落雁 💖💖💖 傾國傾城 💖💖💖</div>
 
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js"></script>
+
   <script>
-    // 飄落愛心
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyBTSiMfHQMayD1mUuPWgLXZ4as5Y5epBdE",
+      authDomain: "yuwen-love.firebaseapp.com",
+      projectId: "yuwen-love",
+      storageBucket: "yuwen-love.firebasestorage.app",
+      messagingSenderId: "238940733157",
+      appId: "1:238940733157:web:e1cf16192f4107d8db5e0c",
+      measurementId: "G-W1MHH7RMYK"
+    };
+
+    // 初始化 Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const countRef = db.collection("love").doc("heart");
+
+    // 取得目前愛心數量並顯示
+    countRef.get().then((doc) => {
+      if (doc.exists) {
+        document.getElementById("heartCount").innerText = doc.data().count;
+      } else {
+        countRef.set({ count: 0 });
+        document.getElementById("heartCount").innerText = 0;
+      }
+    });
+
+    // 飄落愛心動畫
     for (let i = 0; i < 30; i++) {
       const heart = document.createElement('div');
       heart.className = 'heart';
@@ -140,10 +161,7 @@
       document.body.appendChild(heart);
     }
 
-    // 愛心計數
-    let heartCount = 0;
-
-    // 愛心爆炸 + 計數
+    // 愛心爆炸 + 寫入 Firestore
     function explodeHearts(e) {
       const x = e.clientX;
       const y = e.clientY;
@@ -163,9 +181,14 @@
         setTimeout(() => heart.remove(), 1000);
       }
 
-      // 更新愛心數字
-      heartCount++;
-      document.getElementById("heartCount").innerText = heartCount;
+      // 更新資料庫愛心數量
+      countRef.get().then((doc) => {
+        if (doc.exists) {
+          let newCount = doc.data().count + 1;
+          countRef.set({ count: newCount });
+          document.getElementById("heartCount").innerText = newCount;
+        }
+      });
     }
   </script>
 </body>
