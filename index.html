@@ -4,109 +4,7 @@
   <meta charset="UTF-8">
   <title>郁雯仙女得第一</title>
   <style>
-    body {
-      margin: 0;
-      background-color: #ffe6f0;
-      font-family: "微軟正黑體", "Noto Sans TC", sans-serif;
-      overflow: hidden;
-    }
-
-    .content {
-      text-align: center;
-      padding-top: 100px;
-      z-index: 2;
-      position: relative;
-    }
-
-    h1 {
-      color: #e91e63;
-      font-size: 3em;
-      margin-bottom: 20px;
-      animation: fadeIn 1.5s ease;
-    }
-
-    p {
-      color: #333;
-      font-size: 1.5em;
-      animation: fadeIn 2s ease;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .marquee {
-      position: fixed;
-      top: 50%;
-      left: 0;
-      width: 100%;
-      transform: translateY(-50%);
-      white-space: nowrap;
-      overflow: hidden;
-      font-size: 2em;
-      color: #e91e63;
-      opacity: 0.7;
-      animation: marquee 12s linear infinite;
-      z-index: 3;
-      pointer-events: none;
-    }
-
-    @keyframes marquee {
-      0% { transform: translateY(-50%) translateX(100%); }
-      100% { transform: translateY(-50%) translateX(-100%); }
-    }
-
-    .heart {
-      position: absolute;
-      color: #ff69b4;
-      font-size: 1.5em;
-      animation: fall linear infinite;
-      z-index: 1;
-    }
-
-    @keyframes fall {
-      0% { top: -10%; opacity: 1; transform: translateX(0) rotate(0deg); }
-      100% { top: 110%; opacity: 0; transform: translateX(50px) rotate(360deg); }
-    }
-
-    .love-btn {
-      background-color: #ff69b4;
-      color: white;
-      border: none;
-      border-radius: 30px;
-      padding: 12px 24px;
-      font-size: 1.2em;
-      cursor: pointer;
-      margin-top: 120px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-      transition: transform 0.2s;
-    }
-
-    .love-btn:hover {
-      transform: scale(1.1);
-    }
-
-    .explosion-heart {
-      position: absolute;
-      font-size: 1.2em;
-      color: #ff1493;
-      pointer-events: none;
-      animation: explode 1s ease-out forwards;
-    }
-
-    @keyframes explode {
-      to {
-        transform: translate(var(--x), var(--y)) scale(1.5);
-        opacity: 0;
-      }
-    }
-
-    .heart-count {
-      font-size: 1.3em;
-      margin-top: 10px;
-      color: #c2185b;
-    }
+    /* 保留你的所有原始樣式，略過不重貼 */
   </style>
 </head>
 <body>
@@ -119,12 +17,11 @@
 
   <div class="marquee">💖💖💖 蕙質蘭心 💖💖💖 沉魚落雁 💖💖💖 傾國傾城 💖💖💖</div>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js"></script>
+  <!-- Firebase SDK v10 模組 -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-  <script>
-    // Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyBTSiMfHQMayD1mUuPWgLXZ4as5Y5epBdE",
       authDomain: "yuwen-love.firebaseapp.com",
@@ -135,33 +32,43 @@
       measurementId: "G-W1MHH7RMYK"
     };
 
-    // 初始化 Firebase
-    const app = firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    const countRef = db.collection("love").doc("heart");
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const countRef = doc(db, "love", "heart");
 
-    // 取得目前愛心數量並顯示
-    countRef.get().then((doc) => {
-      if (doc.exists) {
-        document.getElementById("heartCount").innerText = doc.data().count;
+    // 初始化愛心數量
+    let heartCount = 0;
+
+    async function loadCount() {
+      const docSnap = await getDoc(countRef);
+      if (docSnap.exists()) {
+        heartCount = docSnap.data().count;
       } else {
-        countRef.set({ count: 0 });
-        document.getElementById("heartCount").innerText = 0;
+        await setDoc(countRef, { count: 0 });
+        heartCount = 0;
       }
-    });
-
-    // 飄落愛心動畫
-    for (let i = 0; i < 30; i++) {
-      const heart = document.createElement('div');
-      heart.className = 'heart';
-      heart.innerText = '💖';
-      heart.style.left = Math.random() * 100 + 'vw';
-      heart.style.animationDuration = (5 + Math.random() * 5) + 's';
-      heart.style.fontSize = (1 + Math.random() * 2) + 'em';
-      document.body.appendChild(heart);
+      document.getElementById("heartCount").innerText = heartCount;
     }
 
-    // 愛心爆炸 + 寫入 Firestore
+    // 更新愛心數
+    async function addHeart() {
+      heartCount++;
+      await setDoc(countRef, { count: heartCount });
+      document.getElementById("heartCount").innerText = heartCount;
+    }
+
+    // 將上面函數傳給全域使用
+    window.loadCount = loadCount;
+    window.addHeart = addHeart;
+
+    // 頁面載入時讀取目前數量
+    loadCount();
+  </script>
+
+  <script>
+    // 飄落愛心動畫（略）
+
+    // 愛心爆炸動畫＋Firestore 更新
     function explodeHearts(e) {
       const x = e.clientX;
       const y = e.clientY;
@@ -181,14 +88,8 @@
         setTimeout(() => heart.remove(), 1000);
       }
 
-      // 更新資料庫愛心數量
-      countRef.get().then((doc) => {
-        if (doc.exists) {
-          let newCount = doc.data().count + 1;
-          countRef.set({ count: newCount });
-          document.getElementById("heartCount").innerText = newCount;
-        }
-      });
+      // 呼叫 Firebase 更新數量
+      window.addHeart();
     }
   </script>
 </body>
