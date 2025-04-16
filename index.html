@@ -36,7 +36,6 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* 中央跑馬燈 */
     .marquee {
       position: fixed;
       top: 50%;
@@ -58,7 +57,6 @@
       100% { transform: translateY(-50%) translateX(-100%); }
     }
 
-    /* 飄落愛心 */
     .heart {
       position: absolute;
       color: #ff69b4;
@@ -80,7 +78,6 @@
       }
     }
 
-    /* 愛心爆炸按鈕 */
     .love-btn {
       background-color: #ff69b4;
       color: white;
@@ -98,7 +95,6 @@
       transform: scale(1.1);
     }
 
-    /* 爆炸愛心樣式 */
     .explosion-heart {
       position: absolute;
       font-size: 1.2em;
@@ -113,6 +109,13 @@
         opacity: 0;
       }
     }
+
+    /* 愛心統計區塊 */
+    .heart-count {
+      font-size: 1.3em;
+      margin-top: 10px;
+      color: #c2185b;
+    }
   </style>
 </head>
 <body>
@@ -120,12 +123,11 @@
     <h1>哈囉！郁雯仙女 😎</h1>
     <p>你怎麼這麼甜～</p>
     <button class="love-btn" onclick="explodeHearts(event)">💘 給甜甜一個愛心</button>
+    <div class="heart-count">目前已收到 💖 <span id="heartCount">0</span> 次愛心！</div>
   </div>
 
-  <!-- 跑馬燈 -->
   <div class="marquee">💖💖💖 蕙質蘭心 💖💖💖 沉魚落雁 💖💖💖 傾國傾城 💖💖💖</div>
 
-  <!-- 飄落愛心 -->
   <script>
     // 飄落愛心
     for (let i = 0; i < 30; i++) {
@@ -138,7 +140,10 @@
       document.body.appendChild(heart);
     }
 
-    // 愛心爆炸動畫
+    // 愛心計數
+    let heartCount = 0;
+
+    // 愛心爆炸 + 計數
     function explodeHearts(e) {
       const x = e.clientX;
       const y = e.clientY;
@@ -157,6 +162,10 @@
         document.body.appendChild(heart);
         setTimeout(() => heart.remove(), 1000);
       }
+
+      // 更新愛心數字
+      heartCount++;
+      document.getElementById("heartCount").innerText = heartCount;
     }
   </script>
 </body>
